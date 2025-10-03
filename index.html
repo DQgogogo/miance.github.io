@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>儿童及青少年个性倾向探索问卷 (勉策心理)</title>
+    <title>儿童九型人格性格测试表 (互动版 V2.2)</title>
     <style>
+        html {
+            scroll-behavior: smooth; /* Enables smooth scrolling for the whole page */
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
@@ -12,22 +15,35 @@
             max-width: 800px;
             margin: 20px auto;
             padding: 0 20px;
-            background-color: #f9f9f9;
+            background-color: #f7f9fc;
         }
         .container {
             background-color: #fff;
             padding: 25px 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
         h1, h2, h3 {
             color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
         }
-        h3 small {
-            color: #e74c3c;
-            font-weight: normal;
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.1em;
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 0;
+        }
+        h3 {
+            background-color: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border-left: 5px solid #3498db;
+            margin-top: 30px;
         }
         .warning {
             background-color: #fffbe6;
@@ -40,75 +56,160 @@
             font-weight: bold;
             color: #d46b08;
         }
-        .question-group {
-            margin-bottom: 25px;
-        }
-        .question-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .options {
+        .question {
+            position: relative; /* Needed for the arrow positioning */
+            margin-bottom: 12px;
+            padding: 15px;
+            padding-left: 35px; /* Make space for the arrow */
+            border: 2px solid transparent;
+            border-radius: 8px;
             display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-top: 5px;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s ease-in-out;
         }
-        .options label {
-            margin: 5px 10px;
-            cursor: pointer;
+        .focus-arrow {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #3498db;
+            opacity: 0;
+            transition: opacity 0.4s;
         }
-        .checkbox-group label {
-            display: block;
-            margin: 8px 0;
+        .question.current-focus {
+            background-color: #f8f9fa;
+            border-color: #3498db;
+        }
+        .question.current-focus .focus-arrow {
+            opacity: 1;
+        }
+        .question.answered {
+            opacity: 0.6;
+        }
+        .question.current-focus.answered {
+             opacity: 1; /* Keep current one fully visible */
+        }
+        .question.unanswered {
+            background-color: #fff2f2 !important;
+            border-color: #e74c3c !important;
+            opacity: 1 !important;
+        }
+        .question-text {
+            flex-grow: 1;
+            padding-right: 15px;
+        }
+        .question-options {
+            flex-shrink: 0;
+            display: flex;
+            gap: 10px;
+        }
+        .question-options label {
             cursor: pointer;
-            padding-left: 5px;
+            padding: 5px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        .question-options input[type="radio"] {
+            display: none;
+        }
+        .question-options input[type="radio"]:checked + span {
+            font-weight: bold;
+        }
+        .question-options label.yes:has(input:checked) {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+         .question-options label.no:has(input:checked) {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+        .info-section {
+            padding: 15px;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            margin-bottom: 25px;
         }
         .info-field {
             margin-bottom: 15px;
         }
         .info-field label {
-            display: inline-block;
-            width: 100px;
+            display: block;
+            margin-bottom: 5px;
             font-weight: bold;
         }
         .info-field input, .info-field select {
-            padding: 8px;
+            width: 100%;
+            padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            width: calc(100% - 120px);
+            box-sizing: border-box;
+        }
+        .reminder-text {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
         }
         button {
             display: block;
             width: 100%;
-            padding: 12px;
-            font-size: 1.2em;
+            padding: 15px;
+            font-size: 1.25em;
+            font-weight: bold;
             background-color: #3498db;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-top: 30px;
         }
         button:hover {
             background-color: #2980b9;
         }
         #results {
             margin-top: 30px;
-            padding: 20px;
+            padding: 25px;
             background-color: #eaf5ff;
             border: 2px solid #b3d9ff;
-            border-radius: 5px;
+            border-radius: 8px;
             display: none; /* Initially hidden */
         }
-        #results ul {
+        #results h3 {
+            background-color: transparent;
+            border: none;
+            padding-left: 0;
+            margin-top: 0;
+            text-align: center;
+        }
+        #results h3 small {
+            display: block;
+            font-size: 0.8em;
+            color: #c0392b;
+            font-weight: bold;
+        }
+        .result-summary, .result-details {
+            margin-bottom: 15px;
+        }
+        .result-details ul, #basic-info-list {
             list-style-type: none;
             padding-left: 0;
         }
-        #results li {
+        .result-details li, #basic-info-list li {
+            padding: 8px 12px;
             background-color: #fff;
-            margin-bottom: 8px;
-            padding: 10px;
+            margin-bottom: 6px;
             border-radius: 4px;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: #f1c40f !important;
         }
         .qr-section {
             text-align: center;
@@ -119,354 +220,255 @@
         .qr-section img {
             max-width: 180px;
             height: auto;
-            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>儿童及青少年个性倾向探索问卷</h1>
-        <h2>(勉策心理)</h2>
+        <h1>儿童九型人格性格测试表</h1>
+        <h2>(互动计分版 V2.2 - 聚焦模式)</h2>
 
         <div class="warning">
-            <p class="warning-title">⚠️ 开篇的重要提醒（请务必仔细阅读）</p>
+            <p class="warning-title">⚠️ 测试前请仔细阅读</p>
             <ul>
-                <li><strong>本问卷结果仅供参考。</strong>其主要目的是为了增进亲子理解与沟通。</li>
-                <li>儿童及青少年的人格处于持续发展和变化中，<strong>请勿用结果给孩子贴上标签</strong>。</li>
-                <li>每一种个性倾向都有其独特的优势和价值，结果没有好坏之分。</li>
-                <li>本页面所有信息仅在您的浏览器中处理，<strong>不会上传至任何服务器</strong>，确保您的隐私安全。</li>
-                <li><strong>我们不储存信息，记得将最后的评测结果截图发给老师！</strong></li>
+                <li>这是一个辅助了解孩子性格倾向的参考工具，<strong>结果并非绝对</strong>。</li>
+                <li>孩子的性格会在成长中不断丰富和变化，请<strong>不要用结果给孩子贴标签</strong>。</li>
+                <li>本页面不储存任何信息，完成测试后，<strong>请务必将结果截图发给老师</strong>。</li>
             </ul>
         </div>
 
-        <form id="personalityQuiz">
-            <h3>一、 孩子的基本信息</h3>
-            <div class="info-field">
-                <label for="childName">孩子姓名:</label>
-                <input type="text" id="childName" name="childName" required>
-            </div>
-            <div class="info-field">
-                <label for="birthDate">出生时间:</label>
-                <input type="date" id="birthDate" name="birthDate" required>
-            </div>
-            <div class="info-field">
-                <label for="gender">性别:</label>
-                <select id="gender" name="gender" required>
-                    <option value="">请选择</option>
-                    <option value="male">男</option>
-                    <option value="female">女</option>
-                </select>
-            </div>
-            <div class="info-field">
-                <label for="birthOrder">家中排行:</label>
-                <select id="birthOrder" name="birthOrder" required>
-                    <option value="">请选择</option>
-                    <option value="only_child">独生子女</option>
-                    <option value="eldest">老大</option>
-                    <option value="middle">中间</option>
-                    <option value="youngest">老幺</option>
-                </select>
-            </div>
-
-
-            <h3>二、 个性倾向探索</h3>
-            
-            <h4>第一部分：我如何与世界互动和获取能量</h4>
-            <div class="question-group">
-                <p class="question-title">1. 在周末或空闲时间，我通常感觉……<br><small>(A) 和朋友们一起热闹地玩耍，能让我更有精神。 (B) 一个人安安静静地看书、画画或做我喜欢的事，更能让我放松。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q1" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q1" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q1" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q1" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q1" value="B2"> 非常像B</label>
+        <form id="enneagramQuiz">
+            <div class="info-section">
+                <div class="info-field">
+                    <label for="childNickname">孩子昵称</label>
+                    <input type="text" id="childNickname" placeholder="请输入孩子的常用昵称" required>
                 </div>
-            </div>
-            <div class="question-group">
-                 <p class="question-title">2. 在一个小组或派对里，我更可能是……<br><small>(A) 很容易就和大家聊起来，积极分享我的想法。 (B) 先在一旁静静地观察和倾听，想清楚了再说。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q2" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q2" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q2" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q2" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q2" value="B2"> 非常像B</label>
+                <p class="reminder-text">为确保分析的参考价值，请真实填写以下信息：</p>
+                <div class="info-field">
+                    <label for="birthDate">出生时间</label>
+                    <input type="date" id="birthDate" required>
                 </div>
-            </div>
-            <div class="question-group">
-                <p class="question-title">3. 在参加完一次热闹的社交活动后，我通常……<br><small>(A) 感觉很兴奋，还想继续玩。 (B) 感觉有点累，需要自己待一会儿来恢复精力。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q3" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q3" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q3" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q3" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q3" value="B2"> 非常像B</label>
+                <div class="info-field">
+                    <label for="gender">性别</label>
+                    <select id="gender" required>
+                        <option value="">请选择</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
                 </div>
-            </div>
-
-            <h4>第二部分：我如何看待信息和学习新知</h4>
-            <div class="question-group">
-                <p class="question-title">4. 当学习一个新游戏或新知识时，我更喜欢……<br><small>(A) 老师或说明书给出清晰、具体的步骤，我按部就班地操作。 (B) 先了解大概的意思和最终目标，然后自己去探索和尝试各种可能性。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q4" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q4" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q4" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q4" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q4" value="B2"> 非常像B</label>
-                </div>
-            </div>
-             <div class="question-group">
-                <p class="question-title">5. 对于故事或电影，我更感兴趣的是……<br><small>(A) 真实发生过的事情或贴近生活的情节。 (B) 充满奇特想象、未来幻想或有深刻寓意的情节。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q5" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q5" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q5" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q5" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q5" value="B2"> 非常像B</label>
-                </div>
-            </div>
-             <div class="question-group">
-                <p class="question-title">6. 当我向别人描述一件事情时，我更倾向于……<br><small>(A) 说清楚事情发生的具体细节，比如谁、在何时、何地、做了什么。 (B) 更多地描述这件事给我的整体感觉，以及它让我想到了什么。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q6" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q6" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q6" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q6" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q6" value="B2"> 非常像B</label>
+                <div class="info-field">
+                    <label for="birthOrder">家中排行</label>
+                    <select id="birthOrder" required>
+                        <option value="">请选择</option>
+                        <option value="独生子女">独生子女</option>
+                        <option value="老大">老大</option>
+                        <option value="中间">中间</option>
+                        <option value="老幺">老幺</option>
+                    </select>
                 </div>
             </div>
             
-            <h4>第三部分：我如何做决定</h4>
-             <div class="question-group">
-                <p class="question-title">7. 当好朋友遇到问题向我求助时，我的第一反应是……<br><small>(A) 帮他分析问题出在哪里，思考怎样做最公平、最符合逻辑。 (B) 先关心他的感受，安慰他，思考怎样做能让他感觉好一些。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q7" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q7" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q7" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q7" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q7" value="B2"> 非常像B</label>
-                </div>
-            </div>
-             <div class="question-group">
-                <p class="question-title">8. 如果有人批评我，我更容易……<br><small>(A) 首先思考：“他说得对不对？有没有道理？” (B) 首先感觉到难过或受伤，很在意对方说话的语气和态度。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q8" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q8" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q8" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q8" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q8" value="B2"> 非常像B</label>
-                </div>
-            </div>
-             <div class="question-group">
-                <p class="question-title">9. 在一个小组里需要做决定时，我认为更重要的是……<br><small>(A) 做出一个最正确、最高效的决定，即使有人会不高兴。 (B) 确保大家都参与进来，尽量让每个人都感到被尊重和满意。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q9" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q9" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q9" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q9" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q9" value="B2"> 非常像B</label>
-                </div>
-            </div>
-            
-            <h4>第四部分：我喜欢怎样的生活方式</h4>
-            <div class="question-group">
-                <p class="question-title">10. 对于一个周末计划或假期安排，我更喜欢……<br><small>(A) 提前把要做的事情、去哪里都安排得明明白白。 (B) 只定一个大概的方向，到时候看心情和情况再决定。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q10" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q10" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q10" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q10" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q10" value="B2"> 非常像B</label>
-                </div>
-            </div>
-             <div class="question-group">
-                <p class="question-title">11. 对于学校的规则和作业的截止日期，我的态度是……<br><small>(A) 认为它们很重要，会努力遵守和按时完成，这样让我有安全感。 (B) 觉得它们有时会有点烦人，我更喜欢按照自己的节奏来。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q11" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q11" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q11" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q11" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q11" value="B2"> 非常像B</label>
-                </div>
-            </div>
-             <div class="question-group">
-                <p class="question-title">12. 我的书桌或房间通常是……<br><small>(A) 东西都摆放得整整齐齐，用完会放回原位。 (B) 可能会有点乱，但我自己知道东西在哪，我喜欢这种随意的感觉。</small></p>
-                <div class="options">
-                    <label><input type="radio" name="q12" value="A2" required> 非常像A</label>
-                    <label><input type="radio" name="q12" value="A1"> 比较像A</label>
-                    <label><input type="radio" name="q12" value="M0"> 介于中间</label>
-                    <label><input type="radio" name="q12" value="B1"> 比较像B</label>
-                    <label><input type="radio" name="q12" value="B2"> 非常像B</label>
-                </div>
-            </div>
-            
-            <h4>第五部分：我的内心深处在追求什么</h4>
-            <div class="question-group checkbox-group">
-                <p class="question-title">请仔细阅读，并选出最像你的2-3项。</p>
-                <label><input type="checkbox" name="q13" value="1"> (1) 我总是想把作业写得工工整整，不喜欢别人做事马虎。</label>
-                <label><input type="checkbox" name="q13" value="2"> (2) 看到朋友不开心，我会主动去安慰他，帮他解决问题。</label>
-                <label><input type="checkbox" name="q13" value="3"> (3) 我喜欢在比赛中获胜，或者当我的作品被表扬时会非常开心。</label>
-                <label><input type="checkbox" name="q13" value="4"> (4) 我不喜欢和别人穿一样的衣服，我有时候会觉得没人真正懂我心里的感觉。</label>
-                <label><input type="checkbox" name="q13" value="5"> (5) 我喜欢把玩具拆开看看里面是什么样的，或者花很长时间研究我感兴趣的东西。</label>
-                <label><input type="checkbox" name="q13" value="6"> (6) 到一个新环境前，我总想先了解清楚规则，对于不确定的事会有点担心。</label>
-                <label><input type="checkbox" name="q13" value="7"> (7) 我总是有很多新奇的想法，喜欢尝试不同的活动，讨厌无聊。</label>
-                <label><input type="checkbox" name="q13" value="8"> (8) 如果看到有人被欺负，我可能会是第一个站出来的。</label>
-                <label><input type="checkbox" name="q13" value="9"> (9) 如果朋友们吵架了，我会觉得很难受，希望他们赶快和好。</label>
-            </div>
+            <div id="quiz-content"></div>
 
-            <h4>第六部分：综合交叉验证</h4>
-             <div class="question-group checkbox-group">
-                <p class="question-title">对我来说，最重要的事情是…… (请选出最重要的1-2项)</p>
-                <label><input type="checkbox" name="q14" value="1"> A. 做正确的事，把事情做好。</label>
-                <label><input type="checkbox" name="q14" value="2"> B. 被人喜欢和接纳，与他人建立温暖的关系。</label>
-                <label><input type="checkbox" name="q14" value="3"> C. 获得成功，让他人看到我的价值。</label>
-                <label><input type="checkbox" name="q14" value="4"> D. 做独一无二的自己，被深刻地理解。</label>
-                <label><input type="checkbox" name="q14" value="5"> E. 弄懂这个世界，获得更多的知识。</label>
-                <label><input type="checkbox" name="q14" value="6"> F. 感到安全和有所准备。</label>
-                <label><input type="checkbox" name="q14" value="7"> G. 体验快乐，对未来充满期待。</label>
-                <label><input type="checkbox" name="q14" value="8"> H. 掌控自己的生活，保护我在乎的人。</label>
-                <label><input type="checkbox" name="q14" value="9"> I. 保持内心的平静，与大家和谐相处。</label>
-            </div>
-
-            <button type="submit">查看结果</button>
+            <button type="submit">完成测试，查看结果</button>
         </form>
 
         <div id="results">
-            <h3 id="resultHeader"></h3>
-            <div id="resultText"></div>
+            <h3 id="result-header">探索结果<small>以下结果请截图发给老师</small></h3>
+            <div id="basic-info-display"></div>
+            <div class="result-summary" id="result-summary"></div>
+            <div class="result-details">
+                <h4>各项“是”的个数统计：</h4>
+                <ul id="result-list"></ul>
+            </div>
         </div>
-
+        
         <div class="qr-section">
             <h4>咨询与深入解读</h4>
-            <p>请将评估结果截图发给老师。<br>孩子更深入的个性化解读和成长建议，<br>↓↓↓ <strong>请扫描下方二维码联系老师进行咨询 ↓↓↓</strong></p>
+            <p>如需更深入的个性化解读和成长建议，<br>请扫描下方二维码联系老师进行咨询。</p>
             <img src="your-qr-code.png" alt="联系老师二维码">
         </div>
+
     </div>
 
     <script>
-        document.getElementById('personalityQuiz').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the form from submitting the traditional way
+        const quizData = {
+            A: { name: "领导力", questions: [ "身边朋友多。", "身强体壮，信心十足，精力旺盛。", "无论在哪里都喜欢发号令，认为自己理所当然是领头羊。", "经常轻视朋友或者与人发生争执。", "把好朋友或弟弟妹妹当做“自己人”，自己则扮演保护者的角色。", "发脾气时行为过激，甚至不可理喻，但是，脾气来得快去得也快，不会持续很长时间。", "不喜欢服从别人。", "勇敢有魄力，喜欢冒险。", "有时刚愎自用，顶撞父母或者老师。", "独立意识强，但也会尽心尽力孝顺父母。", "雷厉风行，敢作敢为。", "看到朋友说话做事慢条斯理，就会焦急烦躁，不能忍耐。", "做自己喜欢的事情时就劲头十足，埋头钻研。", "坦诚率真，但偶尔也有脆弱的一面。", "对前辈谦逊有礼，毕恭毕- 敬。" ] },
+            B: { name: "调和力", questions: [ "温顺听话，让父母放心。", "不擅长整理，一些杂七杂八的东西不及时清理。", "喜欢父母拥抱自己或是类似的身体接触。", "购物时，挑选必用品需要很长时间。", "喜欢在家无所事事，或者用电视、电脑打发时间。", "一定要做的事情拖拖拉拉，开始之前浪费不少时间。", "考试时漫不经心，填写答案草草了事，知道的问题也经常出错。", "害怕电视或漫画中的暴力场景。", "家人或朋友吵架时，就会心情郁闷，有意回避。", "在学校里受了伤也不告诉父母，诸如此类的情况很多。", "平时不紧不慢，但一旦做起事来绝不中途放弃。", "如果受到训斥或者被强制做某事，就固执己见，什么都不想做。", "在他人面前言行不够自然大方。", "遇到选择性的问题，倾向于把决定权交给朋友或长辈。", "乐观开朗，游戏时不计较输赢，而更注重享受游戏本身。" ] },
+            C: { name: "精进力", questions: [ "自己将房间或书桌整理得干净利落。", "眼疾手快，无须父母开口，自己就把事情做得井井有条。", "责任心强，无论担任何种角色，总是做得尽善尽美。", "认真，不喜欢玩笑。", "有毅力改正自己的缺点。", "在家里或学校经常包揽一些事情。", "喜欢忙碌紧张的生活节奏。", "放学回家后立即做作业，作业完成后才肯放松。", "在学校经常气愤地批评朋友不遵守纪律。", "喜欢装作了解、干涉他人。", "虽然不会欺负其他孩子，但总以一种颐指气使的姿态对他人指手画脚。", "在意别人对自己的看法，担心受到批评或指责。", "发脾气的时候经常过分紧张，不易恢复平静。", "生气时过分激动，时常自己憋气。", "富有正义感，思考问题比较理想化，渴望改善不良的现状。" ] },
+            D: { name: "关系力", questions: [ "总是设身处地为他人着想而忽略自己。", "怜悯身处困境的人，希望自己可以帮助他们。", "心灵脆弱，有时会受到伤害。", "即使朋友不提任何要求，也总是把自己的玩具或点心与朋友一起分享。", "不擅长向他人提出要求。", "心理上排斥暴力性的镜头、悲剧性的故事或者残酷的新闻报道。", "有眼力见儿，别人不说，自己也能领会对方的意图。", "十分在意朋友喜欢的话题或是语气。", "为了博得对方的欢心或好感，经常表现得活泼开朗。", "喜欢朋友或弟弟妹妹依赖自己。", "比起学习或其他事情，把自己和朋友的关系放在第一位。", "和朋友吵架时，总是主动示好，希望恢复和对方的友谊。", "渴望得到父母的爱，并为此不断努力。", "如果父母喜欢或者疼爱其他孩子，就明显地表现出嫉妒。", "在意他人的反应或是对自己的评价。" ] },
+            E: { name: "执行力", questions: [ "活泼开朗，好奇心强，才华横溢。", "踊跃参加学校活动，并发挥主导作用。", "责任心强，分内之事做得井井有条，善始善终。", "好胜心强，什么事都希望自己做到最好。", "学习刻苦，以期独享长辈的宠爱和夸奖。", "随机应变能力强，做事效率高，有条不紊。", "凡事喜欢一马当先。", "外出时在意着装，精心打扮。", "喜欢将自己最好的一面展示给别人，并为此大费心思，甚至不惜假装。", "追求时尚，想法现实。", "喜欢树立目标并为之奋斗。", "即使忙得不可交，也总是表现得朝气蓬勃，充满自信。", "对于“高兴”“悲伤”“寂寞”这样的情感表达无动于衷。", "如果自己有过失，就将错误转嫁到别人身上。", "认为只要能够达到目的，走走捷径或者说说谎话也无关紧要。" ] },
+            F: { name: "想象力", questions: [ "对于故事、电影、音乐、美术等感性的东西非常有兴趣。", "挑选物品时十分挑剔，有收集美丽饰物的爱好。", "认生，常被环境氛围左右。", "心灵脆弱，情感细腻，有较强的感受性。", "不喜欢和朋友一样千人一面，暗自希望自己看上去与众不同。", "想象力丰富，喜欢创新。", "好静厌动，不喜欢有规律地做事。", "想要刻意表现得端庄稳重，温文雅尔。", "虽然性格较为内向，但在他人面前表现得充满活力。", "善于察言观色，待人体贴，乐于帮助别人。", "内心羡慕兄弟姐妹或朋友的优点。", "对批评非常敏感，偶尔因为一些琐碎的小事而伤心。", "如果认为父母误解了自己，就会拒绝一切表示反抗。", "不像个孩子，对死亡或悲剧性的事物感兴趣。", "喜欢读名人传记，或是理想化的人物和英雄的故事。" ] },
+            G: { name: "学习力", questions: [ "喜欢自己玩。", "读书或是探究自己感兴趣的领域时，能够长时间地陶醉其中。", "朋友不多，喜欢与志趣相投的朋友安静地交谈。", "对理论感兴趣，喜欢搜集信息。", "遇到不理解的问题时，常常打破沙锅问到底或是查阅书籍，直到找到答案为止。", "话少安静，当别人询问自己的意见时，答案清晰明朗。", "比起烦冗的说明，更喜欢简洁有条理的对话。", "不喜欢别人动自己的物品。", "在聚会时，倾向于以听为主，像旁观者一样观察。", "表情单一，很多时候让人猜不透他在想什么。", "不喜欢受人关注。", "不喜欢集体活动。", "深沉内敛，即使是自己非常想得到的东西也不会缠着父母为自己买。", "对社会准则漠不关心。", "不随便丢弃东西，而是储存起来。" ] },
+            H: { name: "觉察力", questions: [ "对父母百依百顺。", "典型的模范生，深得老师及朋友的信任。", "神经敏感，为一些琐事烦恼。", "做事小心翼翼，过分谨慎。", "喜欢和朋友成群结队。", "害怕自己被朋友疏远排斥。", "偶尔在背后抱怨或嘲讽朋友。", "富有同情心，怜悯弱者或有困难的人。", "遵守时间和秩序。", "优柔寡断，但一旦下定决心就坚持不懈。", "经常会有无谓的担心。", "胆小，易受惊吓。", "有时性情多变，本来有说有- 笑，却又会突然发起脾气。", "害怕受到斥责，做事小心谨慎以防出错。", "关心学校的事情，严格遵守学校的制度或指示。" ] },
+            I: { name: "活动力", questions: [ "朋友成群，喜欢和朋友在一起。", "乐观向上，活泼开朗。", "对事漫不经心，常调皮或恶作剧。", "如果得不到喜欢的东西，就无法忍受。", "一拿到零用钱就花光。", "有意在言行上看起来比同龄人早熟。", "有明星意识和自我陶醉的倾向。", "好奇心强，一日多餐。", "喜欢开玩笑，让朋友心情愉快。", "经常向长辈撒娇。", "好动，很难在某个地方安静地坐一会儿，忍受不了无聊的事情。", "对什么事都十分自信，做事速度快。", "即使受到训斥，不一会儿就抛到九霄云外。", "对新事物很快就感到腻烦。", "做事虎头蛇- 尾，缺乏耐心和毅力。" ] }
+        };
 
-            // --- Basic Info ---
-            const childNameInput = document.getElementById('childName');
-            const birthDateInput = document.getElementById('birthDate');
-            const genderSelect = document.getElementById('gender');
-            const birthOrderSelect = document.getElementById('birthOrder');
+        const resultMapping = {
+            A: "有主见的“领导型”孩子 (第8型)", B: "温和的“和平型”孩子 (第9型)",
+            C: "追求卓越的“完美型”孩子 (第1型)", D: "热心肠的“助人型”孩子 (第2型)",
+            E: "欲望强烈的“成就型”孩子 (第3型)", F: "个性鲜明的“浪漫型”孩子 (第4型)",
+            G: "观察力强的“思考型”孩子 (第5型)", H: "慎重又忠诚的“忠诚型”孩子 (第6型)",
+            I: "活泼开朗喜欢刺激的“活跃型”孩子 (第7型)"
+        };
+        
+        const quizContent = document.getElementById('quiz-content');
+        let allQuestionDivs = [];
+        let currentFocusIndex = 0;
+
+        // Generate Quiz HTML
+        for (const key in quizData) {
+            let sectionHTML = `<h3>TEST ${key} (${quizData[key].name})</h3>`;
+            quizData[key].questions.forEach((q, index) => {
+                const qId = `${key}${index + 1}`;
+                sectionHTML += `
+                    <div class="question" data-question-id="${qId}">
+                        <div class="focus-arrow">▶</div>
+                        <span class="question-text">${index + 1}. ${q}</span>
+                        <div class="question-options">
+                            <label class="yes"><input type="radio" name="q${qId}" value="yes" required><span>是</span></label>
+                            <label class="no"><input type="radio" name="q${qId}" value="no"><span>否</span></label>
+                        </div>
+                    </div>
+                `;
+            });
+            quizContent.innerHTML += sectionHTML;
+        }
+
+        allQuestionDivs = document.querySelectorAll('.question');
+
+        function updateFocus(newIndex) {
+            if (currentFocusIndex < allQuestionDivs.length) {
+                allQuestionDivs[currentFocusIndex].classList.remove('current-focus');
+            }
+            if (newIndex < allQuestionDivs.length) {
+                currentFocusIndex = newIndex;
+                const newFocusQuestion = allQuestionDivs[currentFocusIndex];
+                newFocusQuestion.classList.add('current-focus');
+                // Scroll the element into the vertical center of the viewport
+                newFocusQuestion.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Initialize focus on the first question
+        if(allQuestionDivs.length > 0) {
+            updateFocus(0);
+        }
+
+        // Add event listener to auto-advance and manage classes
+        quizContent.addEventListener('change', function(event) {
+            if (event.target.type === 'radio') {
+                const parentQuestion = event.target.closest('.question');
+                if (parentQuestion) {
+                    parentQuestion.classList.add('answered');
+                    if (parentQuestion.classList.contains('unanswered')) {
+                        parentQuestion.classList.remove('unanswered');
+                    }
+                    
+                    // Find current index and advance
+                    const answeredIndex = Array.from(allQuestionDivs).indexOf(parentQuestion);
+                    if (answeredIndex !== -1 && answeredIndex === currentFocusIndex) {
+                         setTimeout(() => {
+                           updateFocus(currentFocusIndex + 1);
+                        }, 300); // A small delay for a better UX
+                    }
+                }
+            }
+        });
+
+        // Handle Form Submission
+        document.getElementById('enneagramQuiz').addEventListener('submit', function(event) {
+            event.preventDefault();
             
-            const childName = childNameInput.value;
-            const birthDate = birthDateInput.value;
-            const gender = genderSelect.options[genderSelect.selectedIndex].text;
-            const birthOrder = birthOrderSelect.options[birthOrderSelect.selectedIndex].text;
+            document.querySelectorAll('.question.unanswered').forEach(el => el.classList.remove('unanswered'));
 
-            if (!childName || !birthDate || !genderSelect.value || !birthOrderSelect.value) {
-                alert('请填写完整的“孩子的基本信息”。');
+            const childNickname = document.getElementById('childNickname').value;
+            const birthDate = document.getElementById('birthDate').value;
+            const gender = document.getElementById('gender').value;
+            const birthOrder = document.getElementById('birthOrder').value;
+
+            if (!childNickname || !birthDate || !gender || !birthOrder) {
+                alert('请先填写完整的孩子基本信息。');
+                document.querySelector('.info-section').scrollIntoView({ block: 'center' });
                 return;
             }
 
-            // --- Enneagram Checkbox Validation ---
-            const q13Checked = document.querySelectorAll('input[name="q13"]:checked').length;
-            if (q13Checked < 2 || q13Checked > 3) {
-                alert('在“第五部分”中，请不多不少，刚好选择2-3项。');
-                return;
-            }
-            const q14Checked = document.querySelectorAll('input[name="q14"]:checked').length;
-            if (q14Checked < 1 || q14Checked > 2) {
-                alert('在“第六部分”中，请刚好选择1-2项。');
+            const unansweredQuestions = [];
+            allQuestionDivs.forEach(qDiv => {
+                const radioName = `q${qDiv.dataset.questionId}`;
+                const isAnswered = document.querySelector(`input[name="${radioName}"]:checked`);
+                if (!isAnswered) {
+                    unansweredQuestions.push(qDiv);
+                }
+            });
+
+            if (unansweredQuestions.length > 0) {
+                alert(`您还有 ${unansweredQuestions.length} 道题目未完成，未作答的题目已用红色高亮标出。`);
+                unansweredQuestions.forEach(qDiv => qDiv.classList.add('unanswered'));
+                
+                // Update focus to the first unanswered question
+                const firstUnansweredIndex = Array.from(allQuestionDivs).indexOf(unansweredQuestions[0]);
+                updateFocus(firstUnansweredIndex);
                 return;
             }
 
-            // --- MBTI Scoring ---
-            const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-            const mbtiGroups = {
-                EI: ['q1', 'q2', 'q3'],
-                SN: ['q4', 'q5', 'q6'],
-                TF: ['q7', 'q8', 'q9'],
-                JP: ['q10', 'q11', 'q12']
-            };
+            const counts = {};
+            let maxCount = -1;
+            let primaryTypes = [];
 
-            for (const group in mbtiGroups) {
-                mbtiGroups[group].forEach(q => {
-                    const val = document.querySelector(`input[name="${q}"]:checked`).value;
-                    const type = val.charAt(0);
-                    const score = parseInt(val.charAt(1));
-                    if (type === 'A') {
-                        scores[group.charAt(0)] += score;
-                    } else if (type === 'B') {
-                        scores[group.charAt(1)] += score;
+            for (const key in quizData) {
+                let yesCount = 0;
+                quizData[key].questions.forEach((q, index) => {
+                    const qId = `${key}${index + 1}`;
+                    const answer = document.querySelector(`input[name="q${qId}"]:checked`).value;
+                    if (answer === 'yes') {
+                        yesCount++;
                     }
                 });
+                counts[key] = yesCount;
             }
 
-            let mbtiResult = '';
-            mbtiResult += scores.E >= scores.I ? 'E' : 'I';
-            mbtiResult += scores.S >= scores.N ? 'S' : 'N';
-            mbtiResult += scores.T >= scores.F ? 'T' : 'F';
-            mbtiResult += scores.J >= scores.P ? 'J' : 'P';
-            
-            const mbtiBalance = {
-                EI: Math.abs(scores.E - scores.I) < 2 ? '(倾向均衡)' : '',
-                SN: Math.abs(scores.S - scores.N) < 2 ? '(倾向均衡)' : '',
-                TF: Math.abs(scores.T - scores.F) < 2 ? '(倾向均衡)' : '',
-                JP: Math.abs(scores.J - scores.P) < 2 ? '(倾向均衡)' : ''
-            };
-
-            // --- Enneagram Scoring ---
-            const enneagramCounts = {};
-            const q13Selections = document.querySelectorAll('input[name="q13"]:checked');
-            q13Selections.forEach(cb => {
-                enneagramCounts[cb.value] = (enneagramCounts[cb.value] || 0) + 1.5; // Main questions get higher weight
-            });
-            
-            const q14Selections = document.querySelectorAll('input[name="q14"]:checked');
-            q14Selections.forEach(cb => {
-                enneagramCounts[cb.value] = (enneagramCounts[cb.value] || 0) + 1; // Validation questions
-            });
-
-            let mainEnneagramTypes = [];
-            let maxCount = 0;
-            for (const type in enneagramCounts) {
-                if (enneagramCounts[type] > maxCount) {
-                    maxCount = enneagramCounts[type];
+            for (const key in counts) {
+                if (counts[key] > maxCount) {
+                    maxCount = counts[key];
+                    primaryTypes = [key];
+                } else if (counts[key] === maxCount) {
+                    primaryTypes.push(key);
                 }
             }
-            for (const type in enneagramCounts) {
-                 if (enneagramCounts[type] >= maxCount && maxCount > 0) {
-                    mainEnneagramTypes.push(type);
-                }
-            }
-            
-            // --- Display Results ---
-            const resultDiv = document.getElementById('results');
-            const resultHeader = document.getElementById('resultHeader');
-            const resultTextDiv = document.getElementById('resultText');
-            
-            resultHeader.innerHTML = `探索结果 <small>(请将以下完整结果截图发给老师)</small>`;
-            
-            let resultHTML = `<h4>基本信息</h4>`;
-            resultHTML += `<ul>`;
-            resultHTML += `<li><strong>姓名:</strong> ${childName}</li>`;
-            resultHTML += `<li><strong>出生日期:</strong> ${birthDate}</li>`;
-            resultHTML += `<li><strong>性别:</strong> ${gender}</li>`;
-            resultHTML += `<li><strong>家中排行:</strong> ${birthOrder}</li>`;
-            resultHTML += `</ul><hr>`;
-            
-            resultHTML += `<h4>行为模式倾向 (MBTI): ${mbtiResult}</h4>`;
-            resultHTML += `<ul>`;
-            resultHTML += `<li><strong>精力来源:</strong> ${mbtiResult.charAt(0)}型 (E: ${scores.E}分, I: ${scores.I}分) ${mbtiBalance.EI}</li>`;
-            resultHTML += `<li><strong>认知方式:</strong> ${mbtiResult.charAt(1)}型 (S: ${scores.S}分, N: ${scores.N}分) ${mbtiBalance.SN}</li>`;
-            resultHTML += `<li><strong>决策方式:</strong> ${mbtiResult.charAt(2)}型 (T: ${scores.T}分, F: ${scores.F}分) ${mbtiBalance.TF}</li>`;
-            resultHTML += `<li><strong>生活方式:</strong> ${mbtiResult.charAt(3)}型 (J: ${scores.J}分, P: ${scores.P}分) ${mbtiBalance.JP}</li>`;
-            resultHTML += `</ul>`;
-            
-            resultHTML += `<h4>核心动机倾向 (九型人格)</h4>`;
-            resultHTML += `<p>你(孩子)内心的核心需求最可能与 <strong>${mainEnneagramTypes.join('号、')}号</strong> 人格的特点产生共鸣。</p>`;
-            
-            resultHTML += `<hr><p><strong>重要提醒：</strong>此结果是基于您当前选择的初步分析，旨在启发思考和对话。孩子的成长是动态的，请将此作为一个了解的窗口，而非一个静态的标签。</p>`;
 
-            resultTextDiv.innerHTML = resultHTML;
-            resultDiv.style.display = 'block';
-            resultDiv.scrollIntoView({ behavior: 'smooth' });
+            const resultsDiv = document.getElementById('results');
+            const basicInfoDiv = document.getElementById('basic-info-display');
+            const summaryDiv = document.getElementById('result-summary');
+            const listUl = document.getElementById('result-list');
+
+            basicInfoDiv.innerHTML = `
+                <h4>基本信息</h4>
+                <ul id="basic-info-list">
+                    <li><strong>孩子昵称:</strong> ${childNickname}</li>
+                    <li><strong>出生时间:</strong> ${birthDate}</li>
+                    <li><strong>性别:</strong> ${gender}</li>
+                    <li><strong>家中排行:</strong> ${birthOrder}</li>
+                </ul>`;
+
+            summaryDiv.innerHTML = `<h4>性格倾向初步探索</h4>
+                                  <p><strong>主要性格倾向为：${primaryTypes.map(key => resultMapping[key]).join(' 和 ')}</strong></p>`;
+            
+            listUl.innerHTML = '';
+            for (const key in counts) {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>测试 ${key} (${quizData[key].name}):</strong> ${counts[key]} 个“是”`;
+                if (primaryTypes.includes(key)) {
+                    li.classList.add('highlight');
+                }
+                listUl.appendChild(li);
+            }
+
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ block: 'center' });
         });
     </script>
+
 </body>
 </html>
